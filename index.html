@@ -1,0 +1,704 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>730任务及问题清单 — 江河海一体化调度平台</title>
+<style>
+:root {
+  --primary:#1565C0;--primary-dark:#0D47A1;--primary-light:#E3F2FD;
+  --danger:#C62828;--danger-light:#FFEBEE;
+  --success:#2E7D32;--success-light:#E8F5E9;
+  --warning:#E65100;--warning-light:#FFF3E0;
+  --purple:#6A1B9A;--purple-light:#F3E5F5;
+  --gray-50:#FAFAFA;--gray-100:#F5F5F5;--gray-200:#EEEEEE;
+  --gray-300:#E0E0E0;--gray-400:#BDBDBD;--gray-500:#9E9E9E;
+  --gray-600:#757575;--gray-700:#616161;--gray-800:#424242;--gray-900:#212121;
+  --radius:10px;--shadow:0 1px 3px rgba(0,0,0,.1);--shadow-md:0 4px 12px rgba(0,0,0,.12);
+}
+*{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+html{font-size:14px}
+body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI','PingFang SC','Microsoft YaHei',sans-serif;background:var(--gray-100);color:var(--gray-900);line-height:1.5;min-height:100vh}
+
+/* Header */
+.header{background:linear-gradient(135deg,var(--primary),var(--primary-dark));color:white;padding:16px;position:sticky;top:0;z-index:200;box-shadow:var(--shadow-md)}
+.header-top{display:flex;align-items:flex-start;justify-content:space-between;gap:12px}
+.header-title{font-size:17px;font-weight:700;line-height:1.3}
+.header-sub{font-size:12px;opacity:.8;margin-top:2px}
+.header-right{display:flex;gap:6px;align-items:center;flex-shrink:0}
+.hbtn{padding:6px 10px;border-radius:8px;border:none;font-size:12px;font-weight:700;cursor:pointer;transition:all .15s;background:rgba(255,255,255,.2);color:white}
+.hbtn:active{background:rgba(255,255,255,.35)}
+.header-date{font-size:12px;opacity:.7}
+.stats-row{display:grid;grid-template-columns:repeat(4,1fr);gap:8px;margin-top:12px}
+.stat-chip{background:rgba(255,255,255,.18);border-radius:8px;padding:6px 8px;text-align:center;cursor:pointer;transition:background .2s}
+.stat-chip:active{background:rgba(255,255,255,.28)}
+.stat-chip .s-label{font-size:10px;opacity:.8;display:block}
+.stat-chip .s-num{font-size:20px;font-weight:700;line-height:1.2;display:block}
+.stat-chip.critical{background:rgba(198,40,40,.35)}
+.stat-chip.done{background:rgba(46,125,50,.35)}
+
+/* Tab */
+.tab-bar{display:flex;background:white;border-bottom:2px solid var(--gray-200);position:sticky;top:92px;z-index:199;box-shadow:var(--shadow)}
+.tab{flex:1;padding:12px 8px;text-align:center;font-size:14px;font-weight:600;color:var(--gray-500);cursor:pointer;border:none;background:none;border-bottom:3px solid transparent;transition:all .2s;display:flex;align-items:center;justify-content:center;gap:5px}
+.tab.active{color:var(--primary);border-bottom-color:var(--primary)}
+.tab .t-badge{background:var(--danger);color:white;font-size:10px;padding:1px 5px;border-radius:8px;font-weight:700}
+.tab .t-badge.green{background:var(--success)}
+.tab .t-badge.orange{background:var(--warning)}
+
+/* Main */
+.main{padding:12px;max-width:900px;margin:0 auto}
+
+/* Search / Filter */
+.search-box{display:flex;gap:8px;margin-bottom:12px}
+.search-box input{flex:1;min-width:0;padding:9px 12px;border:2px solid var(--gray-300);border-radius:8px;font-size:13px;outline:none;background:white}
+.search-box input:focus{border-color:var(--primary)}
+.filter-row{display:flex;gap:6px;margin-bottom:14px;overflow-x:auto;padding-bottom:2px;-webkit-overflow-scrolling:touch;scrollbar-width:none}
+.filter-row::-webkit-scrollbar{display:none}
+.fchip{flex-shrink:0;padding:5px 12px;border:2px solid var(--gray-300);border-radius:20px;font-size:12px;font-weight:600;cursor:pointer;background:white;color:var(--gray-600);transition:all .15s;white-space:nowrap}
+.fchip:active{transform:scale(.96)}
+.fchip.active{background:var(--primary);color:white;border-color:var(--primary)}
+.fchip.danger.active{background:var(--danger);border-color:var(--danger)}
+.fchip.green.active{background:var(--success);border-color:var(--success)}
+.fchip.orange.active{background:var(--warning);border-color:var(--warning)}
+.fchip.purple.active{background:var(--purple);border-color:var(--purple)}
+
+/* Category */
+.cat{background:white;border-radius:var(--radius);margin-bottom:10px;box-shadow:var(--shadow);overflow:hidden}
+.cat-head{display:flex;align-items:center;gap:10px;padding:11px 14px;background:var(--gray-50);cursor:pointer;user-select:none;border-bottom:1px solid var(--gray-200)}
+.cat-head:active{background:var(--primary-light)}
+.cat-icon{width:32px;height:32px;border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:16px;color:white;flex-shrink:0}
+.cat-title{font-size:14px;font-weight:700;flex:1}
+.cat-meta{font-size:11px;color:var(--gray-500)}
+.cat-badge{font-size:11px;padding:2px 7px;border-radius:10px;background:var(--gray-200);color:var(--gray-600);font-weight:600}
+.cat-badge.done{background:var(--success-light);color:var(--success)}
+.cat-arrow{font-size:16px;color:var(--gray-400);transition:transform .25s;flex-shrink:0}
+.cat.collapsed .cat-arrow{transform:rotate(-90deg)}
+.cat.collapsed .cat-body{display:none}
+
+/* Card */
+.card{display:flex;align-items:flex-start;gap:10px;padding:12px 14px;border-bottom:1px solid var(--gray-100);background:white;cursor:pointer;transition:background .12s}
+.card:last-child{border-bottom:none}
+.card:active{background:var(--primary-light)}
+.card.done-card{opacity:.65}
+.card-num{width:30px;height:30px;border-radius:7px;display:flex;align-items:center;justify-content:center;font-weight:700;font-size:12px;flex-shrink:0;margin-top:1px}
+.card-body{flex:1;min-width:0}
+.card-name{font-size:14px;font-weight:600;line-height:1.4}
+.card-tags{display:flex;gap:4px;flex-wrap:wrap;margin-top:4px}
+.tag{font-size:10px;padding:2px 6px;border-radius:4px;font-weight:700;white-space:nowrap;line-height:1.5}
+.tag-cr{background:var(--danger-light);color:var(--danger)}
+.tag-hi{background:var(--warning-light);color:var(--warning)}
+.tag-no{background:var(--primary-light);color:var(--primary)}
+.tag-src{background:var(--purple-light);color:var(--purple)}
+.tag-bug{background:var(--danger-light);color:var(--danger)}
+.tag-opt{background:var(--primary-light);color:var(--primary)}
+.tag-new{background:var(--purple-light);color:var(--purple)}
+.card-meta{font-size:11px;color:var(--gray-500);margin-top:4px;display:flex;gap:8px;flex-wrap:wrap}
+.card-prob{font-size:12px;color:var(--danger);background:var(--danger-light);border-radius:5px;padding:4px 8px;margin-top:5px}
+.card-action{font-size:12px;color:var(--success);background:var(--success-light);border-radius:5px;padding:4px 8px;margin-top:4px}
+.card-note{font-size:11px;color:var(--gray-600);background:var(--warning-light);border-radius:5px;padding:4px 8px;margin-top:4px;border-left:3px solid var(--warning)}
+.card-right{display:flex;flex-direction:column;align-items:flex-end;gap:4px;flex-shrink:0}
+.sbadge{font-size:11px;padding:3px 8px;border-radius:5px;font-weight:700;white-space:nowrap}
+.sb-in{background:var(--warning-light);color:var(--warning)}
+.sb-done{background:var(--success-light);color:var(--success)}
+.sb-pend{background:var(--danger-light);color:var(--danger)}
+.sb-confirm{background:var(--purple-light);color:var(--purple)}
+.action-btns{display:flex;flex-direction:column;align-items:flex-end;gap:3px}
+.card-btn{font-size:11px;padding:4px 8px;border-radius:5px;border:none;font-weight:700;cursor:pointer;transition:all .15s;white-space:nowrap}
+.card-btn:active{transform:scale(.95)}
+.btn-done{background:var(--success-light);color:var(--success);border:2px solid var(--success)}
+.btn-restore{background:var(--primary-light);color:var(--primary);border:2px solid var(--primary)}
+.btn-edit{background:var(--gray-100);color:var(--gray-600);border:2px solid var(--gray-300)}
+
+/* FAB */
+.fab{position:fixed;bottom:24px;right:24px;z-index:300;display:flex;gap:10px}
+.fab-btn{width:52px;height:52px;border-radius:26px;border:none;font-size:22px;cursor:pointer;box-shadow:var(--shadow-md);transition:all .15s;display:flex;align-items:center;justify-content:center}
+.fab-btn:active{transform:scale(.92)}
+.fab-add{background:var(--primary);color:white}
+.fab-add-menu{display:none;position:fixed;bottom:84px;right:24px;background:white;border-radius:12px;box-shadow:var(--shadow-lg);padding:8px;z-index:301;min-width:140px}
+.fab-add-menu.show{display:block}
+.fab-add-menu button{width:100%;padding:10px 14px;border:none;background:none;font-size:14px;font-weight:700;cursor:pointer;text-align:left;border-radius:8px;display:flex;gap:8px;align-items:center}
+.fab-add-menu button:active{background:var(--primary-light)}
+
+/* Modal */
+.modal-overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,.5);z-index:1000;align-items:flex-end;justify-content:center}
+.modal-overlay.show{display:flex}
+.modal{background:white;border-radius:16px 16px 0 0;width:100%;max-width:560px;max-height:92vh;overflow-y:auto;animation:slideUp .25s ease;-webkit-overflow-scrolling:touch}
+@keyframes slideUp{from{transform:translateY(100%)}to{transform:translateY(0)}}
+.modal-hd{display:flex;align-items:center;justify-content:space-between;padding:16px;border-bottom:1px solid var(--gray-200);position:sticky;top:0;background:white;z-index:1}
+.modal-title{font-size:16px;font-weight:700}
+.modal-close{width:32px;height:32px;border-radius:50%;border:none;background:var(--gray-100);font-size:18px;cursor:pointer;display:flex;align-items:center;justify-content:center}
+.modal-close:active{background:var(--gray-300)}
+.modal-bd{padding:16px}
+.modal-info{background:var(--primary-light);border-radius:8px;padding:10px 12px;font-size:12px;color:var(--primary);margin-bottom:14px;line-height:1.6}
+.field{margin-bottom:14px}
+.field label{display:block;font-size:12px;font-weight:700;color:var(--gray-600);margin-bottom:6px;text-transform:uppercase;letter-spacing:.5px}
+.field input,.field textarea,.field select{width:100%;padding:10px 12px;border:2px solid var(--gray-300);border-radius:8px;font-size:14px;font-family:inherit;resize:vertical;min-height:44px;outline:none;transition:border-color .2s;background:white;line-height:1.5}
+.field textarea{min-height:80px}
+.field input:focus,.field textarea:focus,.field select:focus{border-color:var(--primary)}
+.status-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(90px,1fr));gap:8px}
+.sopt{padding:9px 6px;border:2px solid var(--gray-300);border-radius:8px;text-align:center;font-size:12px;font-weight:600;cursor:pointer;transition:all .15s;background:white;color:var(--gray-600)}
+.sopt:active{transform:scale(.95)}
+.sopt.selected{border-color:var(--primary);background:var(--primary);color:white}
+.sopt.done-opt.selected{border-color:var(--success);background:var(--success)}
+.modal-footer{padding:12px 16px 20px;display:flex;gap:10px}
+.btn{flex:1;padding:12px;border-radius:10px;font-size:15px;font-weight:700;cursor:pointer;border:none;transition:all .15s}
+.btn:active{transform:scale(.97)}
+.btn-cancel{background:var(--gray-200);color:var(--gray-700)}
+.btn-save{background:var(--primary);color:white}
+.btn-save.done-btn-m{background:var(--success)}
+.btn-delete{background:var(--danger-light);color:var(--danger);flex:0.5}
+.modal-tabs{display:flex;border-bottom:2px solid var(--gray-200);margin-bottom:16px}
+.mtab{flex:1;padding:10px;text-align:center;font-size:13px;font-weight:700;cursor:pointer;border:none;background:none;color:var(--gray-500);border-bottom:3px solid transparent;transition:all .2s}
+.mtab.active{color:var(--primary);border-bottom-color:var(--primary)}
+.modal-panel{display:none}
+.modal-panel.active{display:block}
+
+/* Export/Import Modal */
+.data-modal-overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,.5);z-index:1002;align-items:center;justify-content:center}
+.data-modal-overlay.show{display:flex}
+.data-modal{background:white;border-radius:16px;width:90%;max-width:500px;max-height:80vh;overflow-y:auto;padding:20px;animation:fadeIn .2s ease}
+@keyframes fadeIn{from{opacity:0}to{opacity:1}}
+.data-modal h3{font-size:16px;font-weight:700;margin-bottom:12px}
+.data-modal textarea{width:100%;min-height:120px;padding:10px;border:2px solid var(--gray-300);border-radius:8px;font-size:12px;font-family:monospace;resize:vertical}
+.data-modal textarea:focus{border-color:var(--primary)}
+.data-modal .dbtn-row{display:flex;gap:10px;margin-top:12px}
+.data-modal .dbtn{padding:10px 16px;border-radius:8px;font-size:14px;font-weight:700;cursor:pointer;border:none}
+.dbtn-export{background:var(--primary);color:white}
+.dbtn-import{background:var(--success);color:white}
+.dbtn-cancel{background:var(--gray-200);color:var(--gray-700)}
+.dbtn-copy{background:var(--warning);color:white}
+
+/* Empty / Footer */
+.empty{text-align:center;padding:48px 16px;color:var(--gray-400);font-size:14px}
+.empty-icon{font-size:48px;margin-bottom:12px}
+.footer{text-align:center;padding:16px;font-size:11px;color:var(--gray-400)}
+.toast{position:fixed;bottom:80px;left:50%;transform:translateX(-50%) translateY(20px);background:var(--gray-800);color:white;padding:10px 20px;border-radius:20px;font-size:13px;font-weight:600;z-index:9999;opacity:0;transition:all .3s;pointer-events:none;white-space:nowrap}
+.toast.show{opacity:1;transform:translateX(-50%) translateY(0)}
+
+@media(min-width:768px){
+  html{font-size:15px}
+  .header{padding:20px 24px}
+  .stats-row{max-width:600px}
+  .main{padding:20px;max-width:860px}
+  .modal{border-radius:16px;margin:auto;max-height:90vh}
+  .fab{bottom:30px;right:30px}
+  .fab-add-menu{bottom:90px;right:30px}
+  .data-modal{border-radius:16px}
+}
+</style>
+</head>
+<body>
+
+<div class="header">
+  <div class="header-top">
+    <div>
+      <div class="header-title">📋 730任务及问题清单</div>
+      <div class="header-sub">广西水运江河海一体化调度平台 · 聚焦730系统完全上线</div>
+    </div>
+    <div class="header-right">
+      <button class="hbtn" onclick="showDataModal('export')">📤 导出</button>
+      <button class="hbtn" onclick="showDataModal('import')">📥 导入</button>
+    </div>
+  </div>
+  <div class="stats-row">
+    <div class="stat-chip" onclick="jumpTab('tasks')"><span class="s-label">全部任务</span><span class="s-num" id="statAllNum">0</span></div>
+    <div class="stat-chip critical" onclick="jumpFilter('critical')"><span class="s-label">阻塞上线</span><span class="s-num" id="statCrNum">0</span></div>
+    <div class="stat-chip" onclick="jumpTab('probs')"><span class="s-label">待处理问题</span><span class="s-num" id="statProbNum">0</span></div>
+    <div class="stat-chip done" onclick="jumpTab('done')"><span class="s-label">已完成</span><span class="s-num" id="statDoneNum">0</span></div>
+  </div>
+</div>
+
+<div class="tab-bar">
+  <button class="tab active" id="tabTasks" onclick="switchTab('tasks')">📌 任务<span class="t-badge" id="tabTaskBadge">0</span></button>
+  <button class="tab" id="tabProbs" onclick="switchTab('probs')">🐛 问题<span class="t-badge orange" id="tabProbBadge">0</span></button>
+  <button class="tab" id="tabDone" onclick="switchTab('done')">✅ 已完成<span class="t-badge green" id="tabDoneBadge">0</span></button>
+</div>
+
+<div class="main">
+  <div id="tasksPanel">
+    <div class="search-box"><input id="taskSearch" placeholder="搜索任务名称、内容、负责人…" /></div>
+    <div class="filter-row" id="taskFilters">
+      <div class="fchip active" data-f="all" onclick="setTaskFilter('all')">全部</div>
+      <div class="fchip danger" data-f="critical" onclick="setTaskFilter('critical')">🔴 阻塞上线</div>
+      <div class="fchip orange" data-f="high" onclick="setTaskFilter('high')">🟡 高优先</div>
+      <div class="fchip purple" data-f="leader" onclick="setTaskFilter('leader')">📌 领导新增</div>
+      <div class="fchip green" data-f="done" onclick="setTaskFilter('done')">✅ 已完成</div>
+    </div>
+    <div id="taskCats"></div>
+    <div class="empty" id="taskEmpty" style="display:none"><div class="empty-icon">🎉</div><div>没有匹配的任务</div></div>
+  </div>
+
+  <div id="probsPanel" style="display:none">
+    <div class="search-box"><input id="probSearch" placeholder="搜索问题描述、编号、提出单位…" /></div>
+    <div class="filter-row" id="probFilters">
+      <div class="fchip active" data-f="all" onclick="setProbFilter('all')">全部</div>
+      <div class="fchip danger" data-f="bug" onclick="setProbFilter('bug')">🐛 系统BUG</div>
+      <div class="fchip" data-f="opt" onclick="setProbFilter('opt')">⚙️ 功能优化</div>
+      <div class="fchip purple" data-f="new" onclick="setProbFilter('new')">✨ 功能新增</div>
+      <div class="fchip green" data-f="done" onclick="setProbFilter('done')">✅ 已解决</div>
+    </div>
+    <div id="probCats"></div>
+    <div class="empty" id="probEmpty" style="display:none"><div class="empty-icon">🎉</div><div>没有匹配的问题</div></div>
+  </div>
+
+  <div id="donePanel" style="display:none">
+    <div class="search-box"><input id="doneSearch" placeholder="搜索已完成项…" /></div>
+    <div id="doneCats"></div>
+    <div class="empty" id="doneEmpty" style="display:none"><div class="empty-icon">🎉</div><div>还没有已完成的项</div></div>
+  </div>
+</div>
+
+<div class="footer">数据本地存储 · 刷新不丢失 · 导出可迁移 · 2026年7月 v4</div>
+
+<!-- FAB -->
+<div class="fab">
+  <button class="fab-btn fab-add" onclick="toggleAddMenu()">➕</button>
+</div>
+<div class="fab-add-menu" id="addMenu">
+  <button onclick="addItem('task')">📌 新增任务</button>
+  <button onclick="addItem('prob')">🐛 新增问题</button>
+</div>
+
+<!-- Item Modal -->
+<div class="modal-overlay" id="modal">
+  <div class="modal">
+    <div class="modal-hd">
+      <div class="modal-title" id="modalTitle">详情</div>
+      <button class="modal-close" onclick="closeModal()">✕</button>
+    </div>
+    <div class="modal-tabs">
+      <button class="mtab active" id="mtabDetail" onclick="switchMTab('detail')">📋 详情与状态</button>
+      <button class="mtab" id="mtabEdit" onclick="switchMTab('edit')">✏️ 编辑内容</button>
+    </div>
+    <div class="modal-panel active" id="panelDetail">
+      <div class="modal-bd">
+        <div class="modal-info" id="modalInfo"></div>
+        <div class="field"><label>当前状态</label><div class="status-grid" id="statusGrid"></div></div>
+        <div class="field"><label>进度 / 备注</label><textarea id="noteInput" placeholder="今天做了什么…"></textarea></div>
+        <div class="field" id="historyField" style="display:none"><label>历史记录</label><div id="historyList"></div></div>
+      </div>
+      <div class="modal-footer">
+        <button class="btn btn-cancel" onclick="closeModal()">取消</button>
+        <button class="btn btn-save" id="modalSaveBtn" onclick="saveModal()">保存</button>
+      </div>
+    </div>
+    <div class="modal-panel" id="panelEdit">
+      <div class="modal-bd" id="editFields"></div>
+      <div class="modal-footer">
+        <button class="btn btn-cancel" onclick="closeModal()">取消</button>
+        <button class="btn btn-delete" onclick="deleteItem()">🗑 删除</button>
+        <button class="btn btn-save" onclick="saveEdit()">💾 保存</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Data Modal -->
+<div class="data-modal-overlay" id="dataModal">
+  <div class="data-modal">
+    <h3 id="dataModalTitle">数据管理</h3>
+    <div id="dataModalBody">
+      <textarea id="dataTextarea" placeholder="JSON数据…"></textarea>
+    </div>
+    <div class="dbtn-row" id="dataBtnRow"></div>
+  </div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script>
+// ═══ 分类定义 ═══
+const TASK_CATS=[
+  {key:'data',icon:'📡',bg:'#2E7D32',title:'数据接入与信号对接'},
+  {key:'network',icon:'🌐',bg:'#E65100',title:'网络专线与资源环境'},
+  {key:'req',icon:'📋',bg:'#1565C0',title:'需求确认与业务对接'},
+  {key:'go-live',icon:'🚀',bg:'#C62828',title:'系统上线与安全合规'},
+  {key:'leader',icon:'📌',bg:'#6A1B9A',title:'领导意见新增项'},
+];
+const PROB_CATS=[
+  {key:'core',icon:'⚡',bg:'#C62828',title:'调度核心 — 排档与调度流程'},
+  {key:'fee',icon:'💰',bg:'#E65100',title:'收费与缴费管理'},
+  {key:'monitor',icon:'📊',bg:'#1565C0',title:'监控与数据展示'},
+  {key:'ship',icon:'🚢',bg:'#2E7D32',title:'船舶管理与报到'},
+  {key:'other',icon:'📁',bg:'#9E9E9E',title:'其他待处理问题'},
+];
+
+// ═══ 数据 ═══
+let TASKS=[
+  {id:'T01',name:'船闸PLC信息数据接入',cat:'data',pri:'critical',src:'领导新增',desc:'西江与平陆厂家均为北自所，目前北自所负责平陆攻关无法腾出人手。西江需79万接入费用（含接口开发+安全设备）。平陆需先完成专线拉通。',prob:'西江：北自所无法调配人手；平陆：政务云专线尚未打通',action:'1.确定西江PLC接口提供时间；2.平陆先完成专线拉通后对接大数据平台',unit:'平陆运河集团/西江集团/北自所',owner:'王誉颖/方泽铭'},
+  {id:'T02',name:'商务厅单一窗口对接',cat:'data',pri:'critical',src:'领导新增',desc:'商务厅委托开发单位对接，开发单位提出的要求无法满足，原定对接方案无法执行。',prob:'商务厅开发单位要求无法满足，对接方案受阻',action:'1.水运发展中心出面与商务厅沟通；2.如不配合则需大量人力导出清洗历史数据',unit:'商务厅/水运发展中心',owner:'待定'},
+  {id:'T03',name:'感知网数据采集对接',cat:'data',pri:'high',src:'原始',desc:'对接大数据平台获取感知网设备数据，用于调度规则工况判断',prob:'数据采集方法待明确',action:'对接大数据平台获取感知网设备数据',unit:'大数据发展局',owner:'丘志林'},
+  {id:'T04',name:'船舶国籍/所有权等证书数据',cat:'data',pri:'normal',src:'原始',desc:'船舶国籍证书、船舶电台执照、AIS标识码证书、船舶所有权证书',prob:'待提供',action:'需协调数据源单位提供',unit:'海事局',owner:'待定'},
+  {id:'T05',name:'枢纽调度参照水位数据',cat:'data',pri:'normal',src:'原始',desc:'各枢纽调度参照水位数据',prob:'待提供',action:'需协调各枢纽提供参照水位',unit:'各枢纽单位',owner:'待定'},
+  {id:'T06',name:'内河通航要素档案数据',cat:'data',pri:'normal',src:'原始',desc:'内河通航要素档案数据入库',prob:'需交通局上报，需要时间',action:'协调交通局上报通航要素数据',unit:'交通局',owner:'待定'},
+  {id:'T07',name:'视频汇聚接入',cat:'data',pri:'high',src:'原始',desc:'接入大数据发展局、西江、平陆的视频，采用国标GB/T28181协议',prob:'各船闸视频接入方式不一',action:'1.西江平陆平台方式接入；2.其余船闸国标直接接入',unit:'大数据发展局/西江/平陆',owner:'赖兴翔'},
+  {id:'T08',name:'政务云→平陆运河集团专线',cat:'network',pri:'critical',src:'原始',desc:'政务云至平陆运河集团本部网络专线拉通',prob:'待运河集团安排',action:'持续跟进运河集团安排',unit:'平陆运河集团/大数据发展局',owner:'唐辉辉'},
+  {id:'T09',name:'政务云→青年枢纽专线',cat:'network',pri:'critical',src:'原始',desc:'政务云至青年枢纽网络专线拉通',prob:'待运河集团安排',action:'持续跟进运河集团安排',unit:'平陆运河集团/大数据发展局',owner:'唐辉辉'},
+  {id:'T10',name:'政务云→乐滩/百龙滩/大化/大藤峡专线',cat:'network',pri:'high',src:'原始',desc:'4条未完成专线：乐滩、百龙滩、大化、大藤峡',prob:'未完成，方案已出，勘测中',action:'持续跟进勘测进度',unit:'大数据发展局/各枢纽',owner:'唐辉辉'},
+  {id:'T11',name:'正式服务器资源提供',cat:'network',pri:'critical',src:'领导新增',desc:'43台虚机+宝兰德BES中间件+达梦DM8等部署安装',prob:'待大数据发展局提供',action:'跟进正式环境部署情况',unit:'大数据发展局',owner:'丘志林/赖兴翔'},
+  {id:'T12',name:'配套国产数据库中间件部署',cat:'network',pri:'critical',src:'原始',desc:'宝兰德BES+达梦DM8(GIS插件)+达梦DMCDM+达梦DMTDM部署',prob:'正在部署正式环境',action:'厂家配合部署数据库',unit:'宝兰德/达梦',owner:'丘志林/赖兴翔'},
+  {id:'T13',name:'智能语音电话开通',cat:'network',pri:'high',src:'领导新增',desc:'调度业务智能语音电话拨号通知',prob:'跟96短号一并申请',action:'等待短号证下来，给运营商开通专线',unit:'平陆运河管理中心',owner:'丘志林/覃孔韬'},
+  {id:'T14',name:'人工热线开通',cat:'network',pri:'high',src:'原始',desc:'96短号人工热线',prob:'正在申请开通96短号',action:'等待短号证下来，给运营商开通专线',unit:'平陆运河管理中心',owner:'丘志林/覃孔韬'},
+  {id:'T15',name:'平陆运河收费事项',cat:'req',pri:'critical',src:'领导新增',desc:'明确过闸缴费方式、退费开票流程、统一收费主体',prob:'收费账户开户行未明确；自动开票服务商未明确',action:'请平陆运河集团和西江集团共同明确银行和开票服务商',unit:'平陆运河集团/西江集团/水运发展中心',owner:'王誉颖/覃孔韬'},
+  {id:'T16',name:'调度规则工况参数确认',cat:'req',pri:'high',src:'原始',desc:'水规院提供平陆运河不同工况下调度判断条件',prob:'水规院暂未提供具体规则参数',action:'预计7月完成功能开发，对接感知网数据',unit:'水规院/平陆运河集团',owner:'丘志林/覃孔韬'},
+  {id:'T17',name:'功能范围与基础数据模块确认',cat:'req',pri:'normal',src:'原始',desc:'一体化调度平台一阶段功能范围确认',prob:'待各单位反馈意见',action:'跟进意见反馈',unit:'水运发展中心',owner:'陈禹光'},
+  {id:'T18',name:'信用体系建设',cat:'req',pri:'normal',src:'原始',desc:'打造信用体系',prob:'信用体系待明确',action:'建议放9月之后考虑，优先保障通航',unit:'水运发展中心',owner:'待定'},
+  {id:'T19',name:'切换方案落实',cat:'go-live',pri:'critical',src:'领导新增',desc:'新老系统切换方案需明确落实',prob:'未明确切换方案',action:'制定详细切换方案',unit:'水运发展中心',owner:'待定'},
+  {id:'T20',name:'等保/商密/测评工作',cat:'go-live',pri:'critical',src:'领导新增',desc:'网络安全等保测评、商密测评',prob:'预计取得等保时间较久',action:'持续进行等保评测',unit:'水运发展中心/测评机构',owner:'待定'},
+  {id:'T21',name:'7/15新调度班组使用新平台',cat:'go-live',pri:'critical',src:'领导新增',desc:'7月15日新调度班组开始使用新调度平台',prob:'需确保平台功能稳定可用',action:'1.组织新班组培训；2.确保7/15前核心功能就绪',unit:'水运发展中心',owner:'待定'},
+  {id:'T22',name:'海侧功能整改上线',cat:'go-live',pri:'critical',src:'领导新增',desc:'海侧调度功能（含引航）的整改与上线',prob:'海侧功能需整改完善',action:'按730计划完成海侧功能整改',unit:'项目组',owner:'杨洪峰/覃孔韬'},
+  {id:'T23',name:'船民船协实船测试',cat:'go-live',pri:'high',src:'领导新增',desc:'船民和船协参与实船测试',prob:'需组织船民船协参与',action:'组织实船测试，每日出具日检总结',unit:'水运发展中心/船民/船协',owner:'待定'},
+  {id:'T24',name:'电子航道图更新制作',cat:'go-live',pri:'high',src:'归纳',desc:'西江干线电子航道图更新+平陆运河衔接+接入调度平台',prob:'桂林梧州等航道图仍为老旧版本',action:'跟踪航道图嵌入平台情况',unit:'水运发展中心/中交二航院',owner:'覃孔韬'},
+  {id:'T25',name:'应急调度功能开发上线',cat:'go-live',pri:'critical',src:'领导新增',desc:'应急调度功能开发，一个月内上线',prob:'应急调度功能待开发',action:'一个月内完成开发上线',unit:'项目组',owner:'待定'},
+  {id:'T26',name:'排档可解释性优化',cat:'leader',pri:'critical',src:'领导新增',desc:'自动排档结果需有可解释性，展示排档决策因素和权重',prob:'当前排档结果缺乏可解释性',action:'1.排档结果增加决策因素展示；2.排档说明文档编写',unit:'项目组',owner:'待定'},
+  {id:'T27',name:'排档横向比对方案',cat:'leader',pri:'high',src:'领导新增',desc:'排档结果横向比对方案：陆科→王处→朱主任确认',prob:'需制定横向比对方案并走审批流程',action:'制定比对方案→陆科审→王处审→朱主任确认',unit:'项目组/水运发展中心',owner:'陆科→王勇→朱主任'},
+  {id:'T28',name:'阻碍上线问题清单化',cat:'leader',pri:'critical',src:'领导新增',desc:'将阻碍730上线的问题清单化管理，逐项攻坚',prob:'需梳理阻碍上线的全部问题并清单化',action:'梳理阻碍上线问题→清单化→逐项安排攻坚',unit:'项目组',owner:'待定'},
+  {id:'T29',name:'上线准备目标计划制定',cat:'leader',pri:'critical',src:'领导新增',desc:'制定730上线准备的详细目标计划',prob:'缺少上线准备目标计划',action:'制定上线目标计划，明确里程碑节点',unit:'项目组/水运发展中心',owner:'待定'},
+  {id:'T30',name:'数据源迁移核实确认',cat:'leader',pri:'high',src:'领导新增',desc:'核实所有数据源是否已完成迁移或对接',prob:'部分数据源对接未完成（海事、水文、气象等）',action:'逐一核实各数据源迁移对接状态',unit:'项目组/各数据源单位',owner:'丘志林'},
+  {id:'T31',name:'黄厅需求（4项整合）',cat:'leader',pri:'critical',src:'领导新增',desc:'①水位数据实时显示 ②桥梁净空高度 ③支流口流速 ④大型船舶汇船预警',prob:'四个需求均需新功能开发或数据对接',action:'1.水位数据接入展示；2.桥梁净空数据获取与展示；3.支流口流速数据；4.汇船预警功能开发',unit:'项目组/水运发展中心',owner:'待定'},
+  {id:'T32',name:'实船测试日检总结机制',cat:'leader',pri:'high',src:'领导新增',desc:'实船测试期间每日出具检测总结报告',prob:'缺少日检总结机制',action:'建立实船测试日检总结机制，每日出报告',unit:'项目组/水运发展中心',owner:'待定'},
+  {id:'T33',name:'问题集中提报机制',cat:'leader',pri:'high',src:'领导新增',desc:'建立问题集中提报机制，避免零散提交',prob:'问题零散提交，处理效率低',action:'建立问题集中提报渠道和流程',unit:'水运发展中心',owner:'待定'},
+];
+
+let PROBLEMS=[
+  {id:'P01',num:166,type:'bug',cat:'core',desc:'发船或进入闸室后，调度员修改船队，下次执行自动排档任务时，该船队状态变回锚地待闸，闸次号也变更',module:'船闸调度管理-船舶调度',unit:'姚燕',date:'2026.06.29'},
+  {id:'P02',num:167,type:'bug',cat:'core',desc:'排档图出现重叠情况',module:'船闸调度管理-调度监控',unit:'平陆运河建设公司-蒙郁菲',date:'2026.7.1'},
+  {id:'P03',num:168,type:'bug',cat:'core',desc:'闸室有效长度190米，排档船舶总长189.16米，没有富余长度',module:'调度排档',unit:'水运发展中心-陆珍珍',date:''},
+  {id:'P04',num:20,type:'bug',cat:'core',desc:'排档规则上移下移作用未知；规则缺少修改功能；缺少批量操作按钮',module:'调度规则管理',unit:'平陆运河建设公司',date:'2026.5'},
+  {id:'P05',num:64,type:'opt',cat:'core',desc:'新建船队，没缴费的也给排档，应该直接禁止',module:'船舶调度',unit:'水运发展中心-谭琴',date:'2026.5.26'},
+  {id:'P06',num:65,type:'opt',cat:'core',desc:'危险品船应标红提醒专闸通过，加进船队应有弹窗提醒不能和其余货船一起',module:'船舶调度',unit:'水运发展中心-谭琴',date:'2026.5.26'},
+  {id:'P07',num:36,type:'opt',cat:'core',desc:'船舶尺寸过大过不了小闸时，报到已成功但无法调度，应增设自动驳回功能',module:'调度排档',unit:'水运发展中心',date:'2026.5'},
+  {id:'P08',num:165,type:'bug',cat:'core',desc:'长洲枢纽调度监控，船闸显示顺序需按1234排列',module:'船闸调度管理-调度监控',unit:'姚燕',date:'2026.06.29'},
+  {id:'P09',num:49,type:'opt',cat:'core',desc:'船墩/闸室通知发送后没有回馈是否接听，退出后就没有未接听提醒',module:'船舶调度',unit:'水运发展中心-谭琴',date:'2026.5.22'},
+  {id:'P10',num:13,type:'new',cat:'core',desc:'建议增加通话反馈：未接听/已接通/已确认',module:'调度通知',unit:'平陆运河建设公司',date:'2026.5'},
+  {id:'P11',num:3,type:'opt',cat:'fee',desc:'收费数据表缺少唯一标识，增加收费人、收费时间搜索框',module:'收费管理',unit:'平陆运河建设公司',date:'2026.5'},
+  {id:'P12',num:22,type:'opt',cat:'fee',desc:'开票资料确认管理功能未能自动跳转，需缓存调用公司名称、纳税号等信息',module:'收费管理-开票',unit:'平陆运河建设公司',date:'2026.5'},
+  {id:'P13',num:88,type:'opt',cat:'fee',desc:'缴费信息确认方式不明，开票信息空白',module:'收费管理',unit:'水运发展中心-宁美淦',date:''},
+  {id:'P14',num:112,type:'opt',cat:'monitor',desc:'调度监控消息字符串划分为多个字段展示',module:'调度监控',unit:'平陆运河建设公司-李启华',date:'2026.6.8'},
+  {id:'P15',num:115,type:'new',cat:'monitor',desc:'鼠标点击船舶图标显示船舶信息和随船电话',module:'调度监控',unit:'平陆运河建设公司-李启华',date:'2026.6.8'},
+  {id:'P16',num:120,type:'opt',cat:'monitor',desc:'已调船舶及锚地船数据表缺少船舶总吨、核载吨位',module:'调度监控',unit:'平陆运河建设公司-蒙郁菲',date:''},
+  {id:'P17',num:60,type:'opt',cat:'monitor',desc:'船舶调度列表优先显示定位、船名、缴费、吃水、尺寸、手机等',module:'调度列表',unit:'水运发展中心-陆珍珍',date:'2026.5.22'},
+  {id:'P18',num:34,type:'opt',cat:'monitor',desc:'船舶分类颜色区分度不够',module:'调度监控',unit:'水运发展中心-陆珍珍',date:'2026.5'},
+  {id:'P19',num:142,type:'bug',cat:'monitor',desc:'船舶颜色应按类型显示',module:'调度监控',unit:'',date:''},
+  {id:'P20',num:39,type:'new',cat:'monitor',desc:'添加统计报表（日、月报表）',module:'统计报表',unit:'水运发展中心',date:'2026.5.22'},
+  {id:'P21',num:61,type:'new',cat:'monitor',desc:'补充数据统计与报表：每日8时/16时报送通航信息表',module:'统计分析',unit:'水运发展中心-陆珍珍',date:'2026.5.22'},
+  {id:'P22',num:140,type:'opt',cat:'monitor',desc:'申报数据对不上，需与西江数据一致',module:'数据展示',unit:'水运发展中心-王勇',date:''},
+  {id:'P23',num:93,type:'bug',cat:'monitor',desc:'数据不对：航道、水系、枢纽不相对应',module:'数据展示',unit:'水运发展中心-宁美淦',date:''},
+  {id:'P24',num:97,type:'bug',cat:'monitor',desc:'通航建筑物管理：有效尺度、门槛最小水深不对',module:'数据管理',unit:'水运发展中心-宁美淦',date:''},
+  {id:'P25',num:99,type:'bug',cat:'monitor',desc:'码头档案数据不准',module:'数据管理',unit:'水运发展中心-宁美淦',date:''},
+  {id:'P26',num:141,type:'bug',cat:'monitor',desc:'吃水直接取到满载吃水，有问题',module:'数据展示',unit:'',date:''},
+  {id:'P27',num:154,type:'bug',cat:'ship',desc:'航次号查询功能无效；定位来源搜索结果有误；是否缴费搜索结果有误',module:'船舶报到管理',unit:'姚燕',date:'2026.06.23'},
+  {id:'P28',num:81,type:'opt',cat:'ship',desc:'船舶注册问题：①空载吃水为0无提醒②证件有效期过期无提醒③吨位大小逻辑未校验④窗口应直接显示必需证书',module:'船舶注册',unit:'水运发展中心-谭琴',date:''},
+  {id:'P29',num:123,type:'opt',cat:'ship',desc:'船舶绑定审核功能可否放在调度系统中统一审核',module:'船舶管理',unit:'水运发展中心-谭琴',date:''},
+  {id:'P30',num:40,type:'new',cat:'ship',desc:'新增电子围栏，地图底图没有切换影像地图功能',module:'船舶定位',unit:'水运发展中心-谭琴',date:'2026.5.22'},
+  {id:'P31',num:78,type:'opt',cat:'ship',desc:'船舶定位地图没有船闸位置标注',module:'船舶定位',unit:'水运发展中心-谭琴',date:''},
+  {id:'P32',num:43,type:'opt',cat:'ship',desc:'船舶定位选多个没有显示',module:'船舶定位',unit:'水运发展中心-谭琴',date:'2026.5.22'},
+  {id:'P33',num:75,type:'bug',cat:'ship',desc:'码头起点平南终点梧州，显示过的船闸与实际不符',module:'航路规划',unit:'',date:''},
+  {id:'P34',num:68,type:'new',cat:'ship',desc:'船墩/闸室通知只有小程序提醒，缺乏语音/短信提醒',module:'通知方式',unit:'水运发展中心',date:''},
+  {id:'P35',num:10,type:'new',cat:'other',desc:'页面核心业务字段差异化显示：已缴费绿底、未交费红底',module:'界面优化',unit:'平陆运河建设公司',date:'2026.5'},
+  {id:'P36',num:66,type:'opt',cat:'other',desc:'冻结窗口：①备注加常用文字段②自动计算解冻是否超24小时',module:'调度操作',unit:'水运发展中心-谭琴',date:'2026.5.26'},
+];
+
+// ═══ 状态管理 ═══
+const SK='pl730v4';
+let state={},curItem=null,curType=null,taskFilter='all',probFilter='all',selectedStatus='',isNewItem=false;
+
+function loadState(){
+  try{const s=localStorage.getItem(SK);if(s){const d=JSON.parse(s);state=d.state||{};if(d.tasks)TASKS=d.tasks;if(d.problems)PROBLEMS=d.problems}}catch(e){state={}}
+}
+function saveState(){
+  try{localStorage.setItem(SK,JSON.stringify({state,tasks:TASKS,problems:PROBLEMS}))}catch(e){}
+}
+function gs(id){return state[id]||{status:null,note:'',history:[]}}
+function ss(id,st,note){
+  const p=gs(id);
+  const e={date:new Date().toLocaleString('zh-CN',{month:'numeric',day:'numeric',hour:'2-digit',minute:'2-digit'}),status:st,note};
+  state[id]={status:st,note,history:[...(p.history||[]),e]};
+  saveState();
+}
+function isDone(s){return s==='已完成'||s==='已解决'}
+function isHigh(p){return p==='critical'||p==='high'}
+function isCrit(p){return p==='critical'}
+function esc(s){return String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;').replace(/'/g,'&#39;')}
+
+// ═══ ID生成 ═══
+function nextTaskId(){
+  let max=0;TASKS.forEach(t=>{const n=parseInt(t.id.replace('T',''));if(n>max)max=n});return 'T'+(max+1);
+}
+function nextProbId(){
+  let max=0;PROBLEMS.forEach(p=>{const n=parseInt(p.id.replace('P',''));if(n>max)max=n});return 'P'+(max+1);
+}
+function nextProbNum(){
+  let max=0;PROBLEMS.forEach(p=>{if(p.num>max)max=p.num});return max+1;
+}
+
+// ═══ 日期 ═══
+(function(){const d=new Date(),w=['日','一','二','三','四','五','六'];document.querySelector('.header-date')||document.createElement('div');
+  const el=document.querySelector('.header-top');
+  const dd=document.createElement('div');dd.className='header-date';dd.textContent=`${d.getMonth()+1}月${d.getDate()}日 周${w[d.getDay()]}`;
+  el.appendChild(dd);
+})();
+
+// ═══ 渲染 ═══
+function rtc(t,sa){
+  const s=gs(t.id),st=s.status||'进行中',n=s.note||'',dn=isDone(st);
+  const pm={critical:'tag-cr',high:'tag-hi',normal:'tag-no'},pt={critical:'阻塞上线',high:'高优先',normal:'常规推进'};
+  const bm={'进行中':'sb-in','已完成':'sb-done','待处理':'sb-pend','已解决':'sb-done','待确认':'sb-confirm','不予处理':'sb-pend'};
+  const eb=sa&&!dn?`<button class="card-btn btn-edit" onclick="event.stopPropagation();openEdit('task','${t.id}')">✏️</button>`:'';
+  const db=sa&&!dn?`<button class="card-btn btn-done" onclick="event.stopPropagation();quickDone('task','${t.id}')">✅</button>`:'';
+  const rb=sa&&dn?`<button class="card-btn btn-restore" onclick="event.stopPropagation();restoreItem('task','${t.id}')">↩️</button>`:'';
+  return `<div class="card${dn?' done-card':''}" onclick="openModal('task','${t.id}')" data-pri="${t.pri}" data-src="${t.src}" data-done="${dn}" data-name="${t.name}">
+    <div class="card-num" style="background:${dn?'var(--success-light)':'var(--primary-light)'};color:${dn?'var(--success)':'var(--primary)'}">${t.id.replace('T','')}</div>
+    <div class="card-body"><div class="card-name">${t.name}</div>
+      <div class="card-tags"><span class="tag ${pm[t.pri]}">${pt[t.pri]}</span>${t.src==='领导新增'?'<span class="tag tag-src">📌领导新增</span>':''}${n?'<span class="tag tag-hi">📝有备注</span>':''}</div>
+      ${t.prob&&!dn?`<div class="card-prob">⚠️ ${t.prob}</div>`:''}${t.action&&!dn?`<div class="card-action">✅ ${t.action}</div>`:''}${n?`<div class="card-note">📝 ${n}</div>`:''}
+      <div class="card-meta">${t.unit?`<span>负责：${t.unit}</span>`:''}${t.owner?`<span>负责人：${t.owner}</span>`:''}${s.history&&s.history.length?`<span>已更新${s.history.length}次</span>`:''}</div>
+    </div>
+    <div class="card-right"><span class="sbadge ${bm[st]||'sb-in'}">${st}</span><div class="action-btns">${eb}${db}${rb}</div></div></div>`;
+}
+
+function rpc(p,sa){
+  const s=gs(p.id),st=s.status||'待处理',n=s.note||'',dn=isDone(st);
+  const tm={bug:'tag-bug',opt:'tag-opt',new:'tag-new'},tt={bug:'系统BUG',opt:'功能优化',new:'功能新增'};
+  const bm={'待处理':'sb-pend','已解决':'sb-done','待确认':'sb-confirm','不予处理':'sb-pend','进行中':'sb-in','已完成':'sb-done'};
+  const eb=sa&&!dn?`<button class="card-btn btn-edit" onclick="event.stopPropagation();openEdit('prob','${p.id}')">✏️</button>`:'';
+  const db=sa&&!dn?`<button class="card-btn btn-done" onclick="event.stopPropagation();quickDone('prob','${p.id}')">✅</button>`:'';
+  const rb=sa&&dn?`<button class="card-btn btn-restore" onclick="event.stopPropagation();restoreItem('prob','${p.id}')">↩️</button>`:'';
+  return `<div class="card${dn?' done-card':''}" onclick="openModal('prob','${p.id}')" data-type="${p.type}" data-done="${dn}" data-name="${p.desc}">
+    <div class="card-num" style="background:${dn?'var(--success-light)':'var(--danger-light)'};color:${dn?'var(--success)':'var(--danger)'}">${p.num}</div>
+    <div class="card-body"><div class="card-name">${p.desc}</div>
+      <div class="card-tags"><span class="tag ${tm[p.type]}">${tt[p.type]}</span>${n?'<span class="tag tag-hi">📝有备注</span>':''}</div>
+      <div class="card-meta">${p.module?`<span>模块：${p.module}</span>`:''}${p.unit?`<span>提出：${p.unit}</span>`:''}${p.date?`<span>时间：${p.date}</span>`:''}</div>
+    </div>
+    <div class="card-right"><span class="sbadge ${bm[st]||'sb-pend'}">${st}</span><div class="action-btns">${eb}${db}${rb}</div></div></div>`;
+}
+
+function renderAll(){
+  let td=0,tc=0,pd=0;
+  TASKS.forEach(t=>{const s=gs(t.id);if(isDone(s.status||'进行中'))td++;if(isCrit(t.pri))tc++});
+  PROBLEMS.forEach(p=>{if(isDone(gs(p.id).status||'待处理'))pd++});
+  document.getElementById('statAllNum').textContent=`${td}/${TASKS.length}`;
+  document.getElementById('statCrNum').textContent=tc;
+  document.getElementById('statProbNum').textContent=PROBLEMS.length-pd;
+  document.getElementById('statDoneNum').textContent=td+pd;
+  document.getElementById('tabTaskBadge').textContent=TASKS.length-td;
+  document.getElementById('tabProbBadge').textContent=PROBLEMS.length-pd;
+  document.getElementById('tabDoneBadge').textContent=td+pd;
+  rtp();rpp();rdp();
+}
+
+function rtp(){
+  const ce=document.getElementById('taskCats'),ee=document.getElementById('taskEmpty');
+  const q=document.getElementById('taskSearch').value.toLowerCase().trim();
+  let h='',v=0;
+  TASK_CATS.forEach(c=>{
+    const it=TASKS.filter(t=>{
+      if(t.cat!==c.key)return false;
+      if(q&&!(t.name.toLowerCase().includes(q)||t.desc.toLowerCase().includes(q)||(t.owner||'').toLowerCase().includes(q)||(t.unit||'').toLowerCase().includes(q)||(gs(t.id).note||'').toLowerCase().includes(q)))return false;
+      const s=gs(t.id),st=s.status||'进行中',dn=isDone(st);
+      if(taskFilter==='done'&&!dn)return false;if(taskFilter==='critical'&&!isCrit(t.pri))return false;
+      if(taskFilter==='high'&&!isHigh(t.pri))return false;if(taskFilter==='leader'&&t.src!=='领导新增')return false;
+      return true;
+    });
+    const cd=it.filter(t=>isDone(gs(t.id).status||'进行中')).length;
+    if(it.length>0||!q){h+=`<div class="cat${it.length===0&&q?' collapsed':''}" data-cat="${c.key}">
+      <div class="cat-head" onclick="toggleCat(this)"><div class="cat-icon" style="background:${c.bg}">${c.icon}</div>
+      <div><div class="cat-title">${c.title}</div><div class="cat-meta">${cd}/${it.length} 已完成</div></div>
+      <span class="cat-badge${cd>0&&cd===it.length?' done':''}">${it.length}项</span><span class="cat-arrow">▼</span></div>
+      <div class="cat-body">${it.map(t=>rtc(t,true)).join('')}</div></div>`;}
+    v+=it.length;
+  });
+  ce.innerHTML=h||'<div class="empty"><div class="empty-icon">📋</div><div>没有匹配的任务</div></div>';
+  ee.style.display=v===0?'block':'none';
+}
+
+function rpp(){
+  const ce=document.getElementById('probCats'),ee=document.getElementById('probEmpty');
+  const q=document.getElementById('probSearch').value.toLowerCase().trim();
+  let h='',v=0;
+  PROB_CATS.forEach(c=>{
+    const it=PROBLEMS.filter(p=>{
+      if(p.cat!==c.key)return false;
+      if(q&&!(p.desc.toLowerCase().includes(q)||(p.num+'').includes(q)||(p.unit||'').toLowerCase().includes(q)||(p.module||'').toLowerCase().includes(q)))return false;
+      const s=gs(p.id),st=s.status||'待处理',dn=isDone(st);
+      if(probFilter==='done'&&!dn)return false;if(probFilter==='bug'&&p.type!=='bug')return false;
+      if(probFilter==='opt'&&p.type!=='opt')return false;if(probFilter==='new'&&p.type!=='new')return false;
+      return true;
+    });
+    const cd=it.filter(p=>isDone(gs(p.id).status||'待处理')).length;
+    if(it.length>0||!q){h+=`<div class="cat${it.length===0&&q?' collapsed':''}" data-cat="${c.key}">
+      <div class="cat-head" onclick="toggleCat(this)"><div class="cat-icon" style="background:${c.bg}">${c.icon}</div>
+      <div><div class="cat-title">${c.title}</div><div class="cat-meta">${cd}/${it.length} 已解决</div></div>
+      <span class="cat-badge${cd>0&&cd===it.length?' done':''}">${it.length}项</span><span class="cat-arrow">▼</span></div>
+      <div class="cat-body">${it.map(p=>rpc(p,true)).join('')}</div></div>`;}
+    v+=it.length;
+  });
+  ce.innerHTML=h||'<div class="empty"><div class="empty-icon">🐛</div><div>没有匹配的问题</div></div>';
+  ee.style.display=v===0?'block':'none';
+}
+
+function rdp(){
+  const ce=document.getElementById('doneCats'),ee=document.getElementById('doneEmpty');
+  const q=document.getElementById('doneSearch').value.toLowerCase().trim();
+  const dt=TASKS.filter(t=>{const s=gs(t.id);if(!isDone(s.status||'进行中'))return false;if(q&&!(t.name.toLowerCase().includes(q)||t.desc.toLowerCase().includes(q)||(t.owner||'').toLowerCase().includes(q)))return false;return true});
+  const dp=PROBLEMS.filter(p=>{const s=gs(p.id);if(!isDone(s.status||'待处理'))return false;if(q&&!(p.desc.toLowerCase().includes(q)||(p.num+'').includes(q)||(p.unit||'').toLowerCase().includes(q)))return false;return true});
+  let h='';
+  if(dt.length>0){h+=`<div class="cat"><div class="cat-head"><div class="cat-icon" style="background:#1565C0">📌</div><div><div class="cat-title">已完成任务</div><div class="cat-meta">${dt.length}项</div></div></div><div class="cat-body">${dt.map(t=>rtc(t,true)).join('')}</div></div>`}
+  if(dp.length>0){h+=`<div class="cat"><div class="cat-head"><div class="cat-icon" style="background:#C62828">🐛</div><div><div class="cat-title">已解决问题</div><div class="cat-meta">${dp.length}项</div></div></div><div class="cat-body">${dp.map(p=>rpc(p,true)).join('')}</div></div>`}
+  ce.innerHTML=h;ee.style.display=(dt.length+dp.length)==0?'block':'none';
+}
+
+// ═══ Tab & Filter ═══
+function switchTab(t){
+  document.querySelectorAll('.tab').forEach(x=>x.classList.remove('active'));
+  document.getElementById(t==='tasks'?'tabTasks':t==='probs'?'tabProbs':'tabDone').classList.add('active');
+  document.getElementById('tasksPanel').style.display=t==='tasks'?'':'none';
+  document.getElementById('probsPanel').style.display=t==='probs'?'':'none';
+  document.getElementById('donePanel').style.display=t==='done'?'':'none';
+  closeModal();
+}
+function jumpTab(t){switchTab(t==='all'?'tasks':t==='prob'?'probs':t)}
+function jumpFilter(f){switchTab('tasks');setTaskFilter(f)}
+function setTaskFilter(f){taskFilter=f;document.querySelectorAll('#taskFilters .fchip').forEach(c=>c.classList.toggle('active',c.dataset.f===f));renderAll()}
+function setProbFilter(f){probFilter=f;document.querySelectorAll('#probFilters .fchip').forEach(c=>c.classList.toggle('active',c.dataset.f===f));renderAll()}
+function toggleCat(el){el.closest('.cat').classList.toggle('collapsed')}
+
+// ═══ Modal ═══
+function openModal(type,id){
+  curType=type;curItem=type==='task'?TASKS.find(t=>t.id===id):PROBLEMS.find(p=>p.id===id);isNewItem=false;
+  if(!curItem)return;
+  const s=gs(id),cs=s.status||(type==='task'?'进行中':'待处理');
+  document.getElementById('modalTitle').textContent=`${curItem.id} · ${type==='task'?curItem.name:'问题#'+curItem.num}`;
+  const ii=[type==='task'?`📌 ${curItem.desc}`:`🐛 ${curItem.desc}`,type==='task'&&curItem.prob?`⚠️ ${curItem.prob}`:'',type==='task'&&curItem.action?`✅ ${curItem.action}`:'',type==='task'?`🏢 ${curItem.unit}`:`📦 ${curItem.module}`,type==='task'?`👤 ${curItem.owner}`:`🏛 ${curItem.unit}`].filter(Boolean);
+  document.getElementById('modalInfo').innerHTML=ii.join('<br>');
+  const ts=['进行中','已完成'],ps=['待处理','待确认','已解决','不予处理'],sts=type==='task'?ts:ps;
+  document.getElementById('statusGrid').innerHTML=sts.map(st=>`<div class="sopt${st==='已完成'||st==='已解决'?' done-opt':''}${cs===st?' selected':''}" onclick="selSt(this,'${st}')">${st}</div>`).join('');
+  document.getElementById('noteInput').value=s.note||'';
+  const h=s.history||[];const hf=document.getElementById('historyField');
+  if(h.length>0){hf.style.display='block';document.getElementById('historyList').innerHTML=h.map(x=>`<div style="border-left:3px solid ${isDone(x.status)?'var(--success)':'var(--warning)'};padding:4px 8px;margin-bottom:6px;font-size:12px"><div style="font-weight:700;color:var(--gray-600)">${x.date} · ${x.status}</div>${x.note?`<div style="color:var(--gray-700);margin-top:2px">${x.note}</div>`:''}</div>`).join('')}else{hf.style.display='none'}
+  document.getElementById('modalSaveBtn').className='btn btn-save'+(isDone(cs)?' done-btn-m':'');
+  switchMTab('detail');document.getElementById('modal').classList.add('show');document.body.style.overflow='hidden';
+}
+function selSt(el,st){document.querySelectorAll('.sopt').forEach(s=>s.classList.remove('selected'));el.classList.add('selected');selectedStatus=st;document.getElementById('modalSaveBtn').className='btn btn-save'+(isDone(st)?' done-btn-m':'')}
+function closeModal(){document.getElementById('modal').classList.remove('show');document.body.style.overflow='';curItem=null;curType=null;selectedStatus='';isNewItem=false;document.getElementById('addMenu').classList.remove('show')}
+function saveModal(){if(!curItem)return;const st=selectedStatus||(curType==='task'?'进行中':'待处理'),n=document.getElementById('noteInput').value.trim();ss(curItem.id,st,n);closeModal();renderAll();toast(`${curItem.id} 已${isDone(st)?'完成':'更新'}`)}
+function quickDone(type,id){const item=type==='task'?TASKS.find(t=>t.id===id):PROBLEMS.find(p=>p.id===id);if(!item)return;const st=type==='task'?'已完成':'已解决',p=gs(id),h=p.history||[];h.push({date:new Date().toLocaleString('zh-CN',{month:'numeric',day:'numeric',hour:'2-digit',minute:'2-digit'}),status:st,note:'快速标记完成'});state[id]={status:st,note:p.note||'',history:h};saveState();renderAll();toast(`${id} 已标记${st}`)}
+function restoreItem(type,id){const item=type==='task'?TASKS.find(t=>t.id===id):PROBLEMS.find(p=>p.id===id);if(!item)return;const st=type==='task'?'进行中':'待处理',p=gs(id),h=p.history||[];h.push({date:new Date().toLocaleString('zh-CN',{month:'numeric',day:'numeric',hour:'2-digit',minute:'2-digit'}),status:st,note:'从已完成恢复'});state[id]={status:st,note:p.note||'',history:h};saveState();renderAll();toast(`${id} 已恢复`)}
+function switchMTab(t){document.getElementById('mtabDetail').classList.toggle('active',t==='detail');document.getElementById('mtabEdit').classList.toggle('active',t==='edit');document.getElementById('panelDetail').classList.toggle('active',t==='detail');document.getElementById('panelEdit').classList.toggle('active',t==='edit')}
+
+// ═══ 编辑 ═══
+function openEdit(type,id){
+  curType=type;curItem=type==='task'?TASKS.find(t=>t.id===id):PROBLEMS.find(p=>p.id===id);isNewItem=false;
+  if(!curItem)return;
+  document.getElementById('modalTitle').textContent=`${curItem.id} · 编辑`;switchMTab('edit');buildEditFields();document.getElementById('modal').classList.add('show');document.body.style.overflow='hidden';
+}
+function buildEditFields(){
+  const f=document.getElementById('editFields');
+  if(curType==='task'){f.innerHTML=`<div class="field"><label>任务名称</label><input id="ef_name" value="${esc(curItem.name)}" placeholder="输入任务名称"/></div><div class="field"><label>详细描述</label><textarea id="ef_desc">${esc(curItem.desc||'')}</textarea></div><div class="field"><label>存在问题</label><textarea id="ef_prob">${esc(curItem.prob||'')}</textarea></div><div class="field"><label>下一步措施</label><textarea id="ef_action">${esc(curItem.action||'')}</textarea></div><div class="field"><label>负责单位</label><input id="ef_unit" value="${esc(curItem.unit||'')}"/></div><div class="field"><label>负责人</label><input id="ef_owner" value="${esc(curItem.owner||'')}"/></div><div class="field"><label>优先级</label><select id="ef_pri"><option value="critical"${curItem.pri==='critical'?' selected':''}>🔴 阻塞上线</option><option value="high"${curItem.pri==='high'?' selected':''}>🟡 高优先</option><option value="normal"${curItem.pri==='normal'?' selected':''}>⚪ 常规推进</option></select></div><div class="field"><label>所属分类</label><select id="ef_cat">${TASK_CATS.map(c=>`<option value="${c.key}"${curItem.cat===c.key?' selected':''}>${c.icon} ${c.title}</option>`).join('')}</select></div>`}
+  else{f.innerHTML=`<div class="field"><label>问题编号</label><input id="ef_num" type="number" value="${curItem.num}"/></div><div class="field"><label>问题描述</label><textarea id="ef_desc">${esc(curItem.desc||'')}</textarea></div><div class="field"><label>所属模块</label><input id="ef_module" value="${esc(curItem.module||'')}"/></div><div class="field"><label>提出单位/人</label><input id="ef_unit" value="${esc(curItem.unit||'')}"/></div><div class="field"><label>问题类型</label><select id="ef_type"><option value="bug"${curItem.type==='bug'?' selected':''}>🐛 系统BUG</option><option value="opt"${curItem.type==='opt'?' selected':''}>⚙️ 功能优化</option><option value="new"${curItem.type==='new'?' selected':''}>✨ 功能新增</option></select></div><div class="field"><label>问题分类</label><select id="ef_cat">${PROB_CATS.map(c=>`<option value="${c.key}"${curItem.cat===c.key?' selected':''}>${c.icon} ${c.title}</option>`).join('')}</select></div>`}
+}
+function saveEdit(){
+  if(!curItem)return;
+  if(curType==='task'){curItem.name=document.getElementById('ef_name').value.trim()||curItem.name;curItem.desc=document.getElementById('ef_desc').value.trim();curItem.prob=document.getElementById('ef_prob').value.trim();curItem.action=document.getElementById('ef_action').value.trim();curItem.unit=document.getElementById('ef_unit').value.trim();curItem.owner=document.getElementById('ef_owner').value.trim();curItem.pri=document.getElementById('ef_pri').value;curItem.cat=document.getElementById('ef_cat').value}
+  else{const n=parseInt(document.getElementById('ef_num').value);if(n)curItem.num=n;curItem.desc=document.getElementById('ef_desc').value.trim();curItem.module=document.getElementById('ef_module').value.trim();curItem.unit=document.getElementById('ef_unit').value.trim();curItem.type=document.getElementById('ef_type').value;curItem.cat=document.getElementById('ef_cat').value}
+  saveState();closeModal();renderAll();toast(`${curItem.id} 已保存`);
+}
+function deleteItem(){
+  if(!curItem)return;if(!confirm(`确定删除「${curItem.id}」？此操作不可恢复。`))return;
+  if(curType==='task')TASKS=TASKS.filter(t=>t.id!==curItem.id);else PROBLEMS=PROBLEMS.filter(p=>p.id!==curItem.id);
+  delete state[curItem.id];saveState();closeModal();renderAll();toast(`${curItem.id} 已删除`);
+}
+
+// ═══ 新增 ═══
+function toggleAddMenu(){document.getElementById('addMenu').classList.toggle('show')}
+function addItem(type){
+  document.getElementById('addMenu').classList.remove('show');
+  curType=type;isNewItem=true;
+  if(type==='task'){
+    const nid=nextTaskId();
+    curItem={id:nid,name:'',cat:'data',pri:'normal',src:'新增',desc:'',prob:'',action:'',unit:'',owner:''};
+    document.getElementById('modalTitle').textContent=`新增任务 ${nid}`;
+  }else{
+    const nid=nextProbId(),nn=nextProbNum();
+    curItem={id:nid,num:nn,type:'opt',cat:'core',desc:'',module:'',unit:'',date:''};
+    document.getElementById('modalTitle').textContent=`新增问题 ${nid}`;
+  }
+  switchMTab('edit');buildEditFields();
+  // 对新增项，显示详情tab也初始化一下
+  const cs=type==='task'?'进行中':'待处理';
+  const sts=type==='task'?['进行中','已完成']:['待处理','待确认','已解决','不予处理'];
+  document.getElementById('statusGrid').innerHTML=sts.map(st=>`<div class="sopt${st==='已完成'||st==='已解决'?' done-opt':''}" onclick="selSt(this,'${st}')">${st}</div>`).join('');
+  document.getElementById('noteInput').value='';
+  document.getElementById('historyField').style.display='none';
+  document.getElementById('modalInfo').innerHTML=type==='task'?'请填写任务信息':'请填写问题信息';
+  
+  document.getElementById('modal').classList.add('show');document.body.style.overflow='hidden';
+  // 自动聚焦第一个输入框
+  setTimeout(()=>{const first=document.querySelector('#editFields input,#editFields textarea');if(first)first.focus()},300);
+}
+
+// 保存新增项也要加入数组
+function saveEdit(){
+  if(!curItem)return;
+  if(curType==='task'){curItem.name=document.getElementById('ef_name').value.trim()||curItem.name;curItem.desc=document.getElementById('ef_desc').value.trim();curItem.prob=document.getElementById('ef_prob').value.trim();curItem.action=document.getElementById('ef_action').value.trim();curItem.unit=document.getElementById('ef_unit').value.trim();curItem.owner=document.getElementById('ef_owner').value.trim();curItem.pri=document.getElementById('ef_pri').value;curItem.cat=document.getElementById('ef_cat').value}
+  else{const n=parseInt(document.getElementById('ef_num').value);if(n)curItem.num=n;curItem.desc=document.getElementById('ef_desc').value.trim();curItem.module=document.getElementById('ef_module').value.trim();curItem.unit=document.getElementById('ef_unit').value.trim();curItem.type=document.getElementById('ef_type').value;curItem.cat=document.getElementById('ef_cat').value}
+  
+  // 新增项要加入数组
+  if(isNewItem){
+    if(curType==='task'){if(!TASKS.find(t=>t.id===curItem.id))TASKS.push(curItem)}
+    else{if(!PROBLEMS.find(p=>p.id===curItem.id))PROBLEMS.push(curItem)}
+    isNewItem=false;
+  }
+  saveState();closeModal();renderAll();toast(`${curItem.id} 已保存`);
+}
+
+// ═══ 导出/导入 ═══
+function showDataModal(mode){
+  const dm=document.getElementById('dataModal');
+  const tt=document.getElementById('dataModalTitle');
+  const ta=document.getElementById('dataTextarea');
+  const br=document.getElementById('dataBtnRow');
+  
+  if(mode==='export'){
+    tt.textContent='📤 导出数据';
+    const data={state,tasks:TASKS,problems:PROBLEMS,exportTime:new Date().toISOString()};
+    ta.value=JSON.stringify(data,null,2);
+    ta.readOnly=true;
+    br.innerHTML=`<button class="dbtn dbtn-copy" onclick="copyData()">📋 复制到剪贴板</button><button class="dbtn dbtn-cancel" onclick="closeDataModal()">关闭</button>`;
+  }else{
+    tt.textContent='📥 导入数据';
+    ta.value='';ta.readOnly=false;ta.placeholder='粘贴之前导出的JSON数据…';
+    br.innerHTML=`<button class="dbtn dbtn-import" onclick="importData()">📥 导入</button><button class="dbtn dbtn-cancel" onclick="closeDataModal()">取消</button>`;
+  }
+  dm.classList.add('show');
+}
+function closeDataModal(){document.getElementById('dataModal').classList.remove('show')}
+function copyData(){
+  const ta=document.getElementById('dataTextarea');
+  ta.select();document.execCommand('copy');
+  toast('已复制到剪贴板！');
+}
+function importData(){
+  const ta=document.getElementById('dataTextarea');
+  try{
+    const d=JSON.parse(ta.value);
+    if(d.tasks)TASKS=d.tasks;
+    if(d.problems)PROBLEMS=d.problems;
+    if(d.state)state=d.state;
+    saveState();closeDataModal();renderAll();toast('数据导入成功！');
+  }catch(e){toast('导入失败：JSON格式错误');}
+}
+
+// ═══ Toast ═══
+function toast(m){const t=document.getElementById('toast');t.textContent=m;t.classList.add('show');setTimeout(()=>t.classList.remove('show'),2000)}
+
+// ═══ 搜索 ═══
+document.getElementById('taskSearch').addEventListener('input',renderAll);
+document.getElementById('probSearch').addEventListener('input',renderAll);
+document.getElementById('doneSearch').addEventListener('input',renderAll);
+
+// ═══ Init ═══
+loadState();renderAll();
+</script>
+</body>
+</html>
